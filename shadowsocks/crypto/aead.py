@@ -74,7 +74,7 @@ def load_sodium(path=None):
     """
     global libsodium, sodium_loaded
 
-    libsodium = util.find_library('sodium', 'sodium_increment',
+    libsodium = util.find_library('sodium.so.23', 'sodium_increment',
                                   'libsodium', path)
     if libsodium is None:
         print('load libsodium failed with path %s' % path)
