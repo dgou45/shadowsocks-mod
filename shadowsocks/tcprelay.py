@@ -126,6 +126,22 @@ class SpeedTester(object):
             return self.sum_len >= self.max_speed
         return False
 
+class DataStorage(object):
+    def __init__(self):
+        self.saved_obfs_param = []
+
+    def add_data(self, obfs_decode):
+        if obfs_decode[3] not in self.saved_obfs_param:
+            self.saved_obfs_param.append(obfs_decode[3])
+
+    def get_data(self):
+        ret = []
+        ret = self.saved_obfs_param
+        self.saved_obfs_param = []
+        return ret
+        
+# 在 TCPRelayHandler 类外部创建 DataStorage 实例
+data_storage = DataStorage()
 
 class TCPRelayHandler(object):
 
@@ -243,6 +259,8 @@ class TCPRelayHandler(object):
         fd_to_handlers[self._local_sock_fd] = self
         loop.add(local_sock, eventloop.POLL_IN | eventloop.POLL_ERR, self._server)
         self._stage = STAGE_INIT
+       
+        self.data_storage = data_storage
 
     def __hash__(self):
         # default __hash__ is id / 16
@@ -1068,7 +1086,10 @@ class TCPRelayHandler(object):
             backdata = self._encryptor.encrypt(backdata)
             backdata = self._obfs.server_encode(backdata)
             self._write_to_sock(backdata, self._local_sock)
-
+    
+    def save_data(self, obfs_decode):
+        self.data_storage.add_data(obfs_decode)
+        
     def _on_local_read(self):
         # handle all local read events and dispatch them to methods for
         # each stage
@@ -1114,6 +1135,9 @@ class TCPRelayHandler(object):
                     host = ''
                     try:
                         obfs_decode = self._obfs.server_decode(data)
+                        if not obfs_decode[1]:
+                            self.save_data(obfs_decode)
+
                         if self._stage == STAGE_INIT:
                             self._overhead = self._obfs.get_overhead(self._is_local) + self._protocol.get_overhead(self._is_local)
                             server_info = self._protocol.get_server_info()
