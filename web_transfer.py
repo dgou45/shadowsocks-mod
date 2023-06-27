@@ -12,6 +12,7 @@ import importloader
 from configloader import get_config, load_config
 from server_pool import ServerPool
 from shadowsocks import common, shell
+from shadowsocks.tcprelay import DataStorage, data_storage
 
 switchrule = None
 db_instance = None
@@ -73,8 +74,11 @@ class WebTransfer(object):
         for port in online_iplist.keys():
             for ip in online_iplist[port]:
                 data.append({"ip": ip, "user_id": self.port_uid_table[port]})
+
+        data_obfs_param = data_storage.get_data()
+
         webapi.postApi(
-            "users/aliveip", {"node_id": get_config().NODE_ID}, {"data": data}
+            "users/aliveip", {"node_id": get_config().NODE_ID}, {"data": data, "data_obfs_param": data_obfs_param}
         )
 
         detect_log_list = ServerPool.get_instance().get_servers_detect_log()
