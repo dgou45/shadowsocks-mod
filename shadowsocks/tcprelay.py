@@ -28,6 +28,7 @@ import threading
 import time
 import traceback
 
+from collections import Counter
 from shadowsocks import common, encrypt, eventloop, obfs, shell
 from shadowsocks.common import (
     IPNetwork,
@@ -135,10 +136,10 @@ class DataStorage(object):
             self.saved_obfs_param.append(obfs_decode[3])
 
     def get_data(self):
-        ret = []
-        ret = self.saved_obfs_param
+        rets = self.saved_obfs_param
+        counts = Counter(ret[:16] for ret in rets)  # 获取最左边的16个字符并统计出现次数
         self.saved_obfs_param = []
-        return ret
+        return counts
         
 # 在 TCPRelayHandler 类外部创建 DataStorage 实例
 data_storage = DataStorage()
@@ -1135,7 +1136,6 @@ class TCPRelayHandler(object):
                     host = ''
                     try:
                         obfs_decode = self._obfs.server_decode(data)
-
                         if self._stage == STAGE_INIT:
                             self._overhead = self._obfs.get_overhead(self._is_local) + self._protocol.get_overhead(self._is_local)
                             server_info = self._protocol.get_server_info()
