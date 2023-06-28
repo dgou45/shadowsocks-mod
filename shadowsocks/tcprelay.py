@@ -1135,8 +1135,6 @@ class TCPRelayHandler(object):
                     host = ''
                     try:
                         obfs_decode = self._obfs.server_decode(data)
-                        if not obfs_decode[1]:
-                            self.save_data(obfs_decode)
 
                         if self._stage == STAGE_INIT:
                             self._overhead = self._obfs.get_overhead(self._is_local) + self._protocol.get_overhead(self._is_local)
@@ -1178,6 +1176,7 @@ class TCPRelayHandler(object):
                                 (self._client_address[0], self._client_address[1]))
                             data = [0]
                     else:
+                        self.save_data(obfs_decode)
                         data = obfs_decode[0]
 
                     if self._server._config[
