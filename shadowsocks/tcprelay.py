@@ -137,9 +137,8 @@ class DataStorage(object):
 
     def get_data(self):
         rets = self.saved_obfs_param
-        counts = Counter(ret[:16] for ret in rets)  # 获取最左边的16个字符并统计出现次数
         self.saved_obfs_param = []
-        return counts
+        return rets
         
 # 在 TCPRelayHandler 类外部创建 DataStorage 实例
 data_storage = DataStorage()
