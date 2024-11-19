@@ -59,7 +59,7 @@ class WebApi(object):
             timeout=10,
         )
         if response.status_code == 204:
-            logging.info("Received 204 No Content. Returning default response.")
+            logging.info("Received 204 No Content")
             json_data = {"ret": 1, "data": "ok"}
         else:
             if response.status_code != 200:
