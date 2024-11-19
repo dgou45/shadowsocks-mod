@@ -76,24 +76,9 @@ class WebTransfer(object):
                 data.append({"ip": ip, "user_id": self.port_uid_table[port]})
 
         data_obfs_param = data_storage.get_data()
-
         webapi.postApi(
             "users/aliveip", {"node_id": get_config().NODE_ID}, {"data": data, "data_obfs_param": data_obfs_param}
         )
-
-        detect_log_list = ServerPool.get_instance().get_servers_detect_log()
-        data = []
-        for port in detect_log_list.keys():
-            for rule_id in detect_log_list[port]:
-                data.append(
-                    {"list_id": rule_id, "user_id": self.port_uid_table[port]}
-                )
-        webapi.postApi(
-            "users/detectlog",
-            {"node_id": get_config().NODE_ID},
-            {"data": data},
-        )
-
         return update_transfer
 
     def uptime(self):
