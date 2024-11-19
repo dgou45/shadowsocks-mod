@@ -58,22 +58,26 @@ class WebApi(object):
             json=json,
             timeout=10,
         )
-        if response.status_code != 200:
-            logging.error("Server error with status code: %i" %
-                          response.status_code)
-            raise Exception('Server Error!')
+        if response.status_code == 204:
+            logging.info("Received 204 No Content. Returning default response.")
+            json_data = {"ret": 1, "data": "ok"}
+        else:
+            if response.status_code != 200:
+                logging.error("Server error with status code: %i" %
+                                response.status_code)
+                raise Exception('Server Error!')
 
-        try:
-            json_data = response.json()
-        except:
-            logging.error("Wrong data: %s" % response.text)
-            raise Exception('Server Error!')
+            try:
+                json_data = response.json()
+            except:
+                logging.error("Wrong data: %s" % response.text)
+                raise Exception('Server Error!')
 
-        if len(json_data) != 2:
-            logging.error("Wrong data: %s" % response.text)
-            raise Exception('Server Error!')
-        if json_data["ret"] == 0:
-            logging.error("Wrong data: %s" % json_data["data"])
-            raise Exception('Server Error!')
+            if len(json_data) != 2:
+                logging.error("Wrong data: %s" % response.text)
+                raise Exception('Server Error!')
+            if json_data["ret"] == 0:
+                logging.error("Wrong data: %s" % json_data["data"])
+                raise Exception('Server Error!')
 
         return json_data["data"]
