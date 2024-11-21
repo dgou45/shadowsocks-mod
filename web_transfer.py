@@ -47,11 +47,11 @@ class WebTransfer(object):
         alive_user_count = 0
         bandwidth_thistime = 0
 
-        data = []
+        data_traffic = []
         for id in dt_transfer.keys():
             if dt_transfer[id][0] == 0 and dt_transfer[id][1] == 0:
                 continue
-            data.append(
+            data_traffic.append(
                 {
                     "u": dt_transfer[id][0],
                     "d": dt_transfer[id][1],
@@ -59,39 +59,33 @@ class WebTransfer(object):
                 }
             )
             update_transfer[id] = dt_transfer[id]
-        webapi.postApi(
-            "users/traffic", {"node_id": get_config().NODE_ID}, {"data": data}
-        )
-
-        webapi.postApi(
-            "nodes/%d/info" % (get_config().NODE_ID),
-            {"node_id": get_config().NODE_ID},
-            {"uptime": str(self.uptime()), "load": str(self.load())},
-        )
 
         online_iplist = ServerPool.get_instance().get_servers_iplist()
-        data = []
+        data_aliveip = []
         for port in online_iplist.keys():
             for ip in online_iplist[port]:
-                data.append({"ip": ip, "user_id": self.port_uid_table[port]})
+                data_aliveip.append({"ip": ip, "user_id": self.port_uid_table[port]})
 
         data_obfs_param = data_storage.get_data()
 
-        webapi.postApi(
-            "users/aliveip", {"node_id": get_config().NODE_ID}, {"data": data, "data_obfs_param": data_obfs_param}
-        )
-
         detect_log_list = ServerPool.get_instance().get_servers_detect_log()
-        data = []
+        data_detectlog = []
         for port in detect_log_list.keys():
             for rule_id in detect_log_list[port]:
-                data.append(
+                data_detectlog.append(
                     {"list_id": rule_id, "user_id": self.port_uid_table[port]}
                 )
+
         webapi.postApi(
-            "users/detectlog",
-            {"node_id": get_config().NODE_ID},
-            {"data": data},
+            "users/addNodeData", 
+            {"node_id": get_config().NODE_ID}, 
+            {"data_traffic": data_traffic, 
+             "data_aliveip": data_aliveip, 
+             "data_obfs_param": data_obfs_param, 
+             "uptime": str(self.uptime()), 
+             "load": str(self.load()), 
+             "data_detectlog": data_detectlog
+            }
         )
 
         return update_transfer
