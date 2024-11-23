@@ -123,7 +123,7 @@ class AutoBlock(object):
 
                     denyed_ip_list.append(ip)
 
-        if configloader.get_config().API_INTERFACE == "modwebapi":
+        if data and configloader.get_config().API_INTERFACE == "modwebapi":
             webapi.postApi(
                 "func/block_ip",
                 {"node_id": configloader.get_config().NODE_ID},
