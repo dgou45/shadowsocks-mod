@@ -1,6 +1,13 @@
 #!/bin/bash
-cd `dirname $0`
-eval $(ps -ef | grep "[0-9] python3 server\\.py m" | awk '{print "kill "$2}')
+set -e
+cd "$(dirname "$0")"
+
+# 查找旧进程并杀掉（不报错）
+pkill -f "python3 server.py" || true
+
+# 设置最大打开文件数
 ulimit -n 512000
-nohup python3 server.py m>> /dev/null 2>&1 &
+
+# 以前台方式运行 SSR（关键）
+exec python3 server.py
 
