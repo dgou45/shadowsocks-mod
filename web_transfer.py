@@ -7,7 +7,6 @@ import os
 import platform
 import socket
 import traceback
-import time
 
 import importloader
 from configloader import get_config, load_config
@@ -546,9 +545,7 @@ class WebTransfer(object):
                 except Exception as e:
                     trace = traceback.format_exc()
                     logging.error(trace)
-                    logging.error("面板连接失败，正在退出以触发 systemd 自动重启")
-                    time.sleep(5)
-                    os._exit(1)
+                    # logging.warn('db thread except:%s' % e)
                 if (
                         db_instance.event.wait(60)
                         or not db_instance.is_all_thread_alive()
